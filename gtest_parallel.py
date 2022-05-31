@@ -620,12 +620,17 @@ def find_tests(binaries, additional_args, options, times):
       if line[0] != " ":
         # Remove comments for typed tests and strip whitespace.
         test_group = line.split('#')[0].strip()
-        continue
-      # Remove comments for parameterized tests and strip whitespace.
-      line = line.split('#')[0].strip()
-      if not line:
-        continue
-
+        if options.group_test_cases:
+          line = "*"
+        else:
+          continue
+      else:
+        if options.group_test_cases:
+          continue
+        # Remove comments for parameterized tests and strip whitespace.
+        line = line.split('#')[0].strip()
+        if not line:
+          continue
       test_name = test_group + line
       if not options.gtest_also_run_disabled_tests and 'DISABLED_' in test_name:
         continue
@@ -780,6 +785,10 @@ def default_options_parser():
                     default=False,
                     help='Do not run tests from the same test '
                     'case in parallel.')
+  parser.add_option('--group_test_cases',
+                    action='store_true',
+                    default=False,
+                    help='Run tests from the same test case in a single process.')
   return parser
 
 
